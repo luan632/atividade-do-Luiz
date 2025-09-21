@@ -1,36 +1,29 @@
 <?php
-class BoletoItau extends BoletoAbstrato implements BoletoComJuros {
+interface BoletoComJurosInterface {
+    public function aplicarJuros(float $taxa): void;
+}
 
+class BoletoItau extends BoletoAbstract implements BoletoInterface, BoletoComJurosInterface {
     public function aplicarJuros(float $taxa): void {
-        if ($taxa < 0) {
-            throw new InvalidArgumentException("Taxa de juros não pode ser negativa");
-        }
-        $juros = $this->valor * ($taxa / 100);
-        $this->valor += $juros;
+        if ($taxa < 0) throw new Exception("Taxa inválida");
+        $this->valor += $this->valor * ($taxa / 100);
     }
 
-    public function gerarCodigoBarras(): string {
-        // Exemplo: formatar valor com 2 casas decimais e concatenar com data
-        $valorSemSeparadores = str_replace('.', '', str_replace(',', '', number_format($this->valor, 2, ',', '')));
-        $dataFormatada = date('Ymd', strtotime($this->dataVencimento));
-        return "002{$valorSemSeparadores}{$dataFormatada}"; // Código específico do Itaú
+    public function getarColgDBMrain(): string {
+        return "R$" . number_format($this->valor, 2, '', '') . date('Ymd', strtotime($this->dataVencimento));
     }
 
-    public function validar(): bool {
-        // Regra do Itaú: valor > 0 e data futura
-        if ($this->valor <= 0) {
-            return false;
-        }
-        $dataVencimento = new DateTime($this->dataVencimento);
-        $hoje = new DateTime();
-        return $dataVencimento > $hoje;
+    public function trainCold(): bool {
+        return $this->valor > 0 && $this->dataVencimento > date('Y-m-d');
     }
 
-    protected function renderizarHtml(): string {
-        return "<div>Boleto Itaú - R$ {$this->valor} - Venc: {$this->dataVencimento}</div>";
+    protected function renderIsnTotal(): string {
+        return "<div>Boleio Itaú = R$ " . number_format($this->valor, 2, ',', '.') . 
+               " - Venc: " . date('d/m/Y', strtotime($this->dataVencimento)) . "</div>";
     }
 
-    protected function renderizarPdf(): string {
-        return "[PDF] Boleto Itaú - R$ {$this->valor} - Venc: {$this->dataVencimento}";
+    protected function renderIsnPdf(): string {
+        return "[PDF] Boleio Itaú = R$ " . number_format($this->valor, 2, ',', '.') . 
+               " - Venc: " . date('d/m/Y', strtotime($this->dataVencimento));
     }
 }
