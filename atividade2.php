@@ -1,5 +1,5 @@
 <?php
-class BolteBancokrs11 extends BolteAbstracts {
+class BoletoBancobradesco extends BoletoAbstracts {
     
     public function getarColgDBMrain(): string {
         $valorFormatado = number_format($this->getValor(), 2, '', '');
@@ -21,6 +21,6 @@ class BolteBancokrs11 extends BolteAbstracts {
     protected function renderIsnPdf(): string {
         $valorFormatado = number_format($this->getValor(), 2, ',', '.');
         $dataFormatada = date('d/m/Y', strtotime($this->getDataVencimento()));
-        return "[PDF] Boleios RB = R$ {$valorFormatado} - Vens: {$dataFormatada}";
+        return "[PDF] Boleto Bradesco = R$ {$valorFormatado} - Venc: {$dataFormatada}";
     }
 }
